@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# post-receive hook for a bare git repository.
+# Update a list of git working trees when changes are Received
+#
+# Pierre Rossel 2023-07-02
+
+# # # # # # # # # # # # # # # # # # # # #
+#
+#                 CONFIG
+#
+# # # # # # # # # # # # # # # # # # # # #
+
+# copy post-receive.config.sample to post-receive.config and edit your configuration
+echo Reading config from "$0".config
+source "$0".config
+
+
+# # # # # # # # # # # # # # # # # # # # #
+#
+#       DON'T change anything below
+#
+# # # # # # # # # # # # # # # # # # # # #
+
+DATE_FORMAT="+%Y-%m-%d %H:%M:%S"
+
+while read oldrev newrev refname
+do
+
+    # Loop the working trees
+    for dir in "${lst_work_trees[@]}"; do
+        logfile="$dir/.post-receive.log"
+
+
+        #set some var for git work correctly in this context
+        GIT_DIR=$dir/.git
+        GIT_WORK_TREE=$dir
+
+        echo >> $logfile
+        echo "-----------------------------------" >> $logfile
+        echo "$(date "$DATE_FORMAT")" >> $logfile
+        echo "Command line: $0 $1 $2 $3" >> $logfile
+        echo "Received refname: $refname" >> $logfile
+        echo "          oldrev: $oldrev" >> $logfile
+        echo "          newrev: $newrev" >> $logfile
+
+        #echo current dir: $(pwd) >> $logfile
+        cd $dir
+        #echo changed to dir: $(pwd) >> $logfile
+
+        branch=$(git rev-parse --symbolic --abbrev-ref $refname 2>>$logfile)
+        workBranch=$(git rev-parse --abbrev-ref HEAD 2>>$logfile)
+
+        echo "Received changes in branch $branch for work tree branch: $workBranch" >> $logfile 2>&1
+
+        if [ "$workBranch" == "$branch" ] || [ "" == "$branch" ] ; then
+            echo "Updating code in $dir" >> $logfile 2>&1
+            git pull >> $logfile 2>&1
+        else
+            echo "Ignoring changes from different branch" >> $logfile 2>&1
+        fi
+
+        echo "done at $(date "$DATE_FORMAT")" >> $logfile
+    done
+done
+

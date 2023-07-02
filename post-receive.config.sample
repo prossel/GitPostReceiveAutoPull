@@ -1,0 +1,7 @@
+# Add as many working trees as needed in the lst_work_trees (duplicate line and change path)
+# Each path must not end with / and be a git working tree (containing a .git folder)
+# Each working tree will be pulled if they are on the same branch as the received commit
+
+lst_work_trees+=(~/sites/mysite.com/prod)
+lst_work_trees+=(~/sites/mysite.com/dev)
+lst_work_trees+=(~/sites/prod/wp-content/themes/mytheme)
