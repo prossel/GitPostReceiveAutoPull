@@ -1,6 +1,6 @@
 # Git post-receive auto pull
 
-This repos contains a helper script in bash to automatically pull a list of git working directories which branches match the received commits.
+This repository contains a helper script in bash to automatically pull a list of git working directories where current branche matches the received commits.
 
 ## Install
 
